@@ -1,2 +1,2 @@
 # cfn-appstack
-Cloudformation template (JSON) for a simple application stack
+Cloudformation template (JSON) for a simple application stack.
