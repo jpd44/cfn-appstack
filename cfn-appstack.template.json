@@ -45,52 +45,22 @@
   },
 
   "Resources" : {
-    "WebServerGroup" : {
+    "WebServerASG" : {
       "Type" : "AWS::AutoScaling::AutoScalingGroup",
       "Properties" : {
         "AvailabilityZones" : ["us-east-1a", "us-east-1c", "us-east-1d"],
-        "LaunchConfigurationName" : { "Ref" : "LaunchConfig" },
-        "MinSize" : "1",
+        "LaunchConfigurationName" : { "Ref" : "WebServerLC" },
+        "MinSize" : "3",
         "MaxSize" : "3",
         "LoadBalancerNames" : [ { "Ref" : "ElasticLoadBalancer" } ]
       }
    },
 
-    "LaunchConfig" : {
+    "WebServerLC" : {
       "Type" : "AWS::AutoScaling::LaunchConfiguration",
       "Properties" : {
         "KeyName" : { "Ref" : "KeyName" },
-        "ImageId" : "ami-7c807d14",
-        
-        "UserData" : { "Fn::Base64" : { "Fn::Join" : ["",[
-            "#!/bin/bash","\n",          
-
-			"# install openjdk and tomcat7 from the AWS repo","\n",
-			"# John Dixon, 6-25-2014","\n",
-			"# tested with m1.small instance size","\n",
-
-			"# update packages","\n",
-			"yum -y update","\n",
-
-			"# install the JDK","\n",
-			"yum -y install java-1.7.0-openjdk-devel","\n",
-
-			"# install tomcat7 and default webapps in /usr/share/tomcat7","\n",
-			"yum -y install tomcat7 tomcat7-webapps tomcat7-docs-webapp tomcat7-admin-webapps","\n",
-
-			"# set the daemon to start automatically","\n",
-			"chkconfig --level 345 tomcat7 on","\n",
-
-			"# start the daemon now","\n",
-			"service tomcat7 start","\n",
-
-			"# add a user to the tomcat configuration","\n",
-			"echo '<tomcat-users>' > /usr/share/tomcat7/conf/tomcat-users.xml","\n",
-			"echo '<user username=\"jpdixon\" password=\"Greenpages123!\" roles=\"admin-gui,manager-gui,manager-status\"/>' >> /usr/share/tomcat7/conf/tomcat-users.xml","\n",
-
-			"echo '</tomcat-users>' >> /usr/share/tomcat7/conf/tomcat-users.xml","\n",
-                  "\"\"\n" ]]}},
-        
+        "ImageId" : "ami-f0f6d1e7",
         "SecurityGroups" : [ { "Ref" : "InstanceSecurityGroup" } ],
         "InstanceType" : "m1.small"
       }
@@ -100,7 +70,7 @@
       "Type" : "AWS::AutoScaling::ScalingPolicy",
       "Properties" : {
         "AdjustmentType" : "ChangeInCapacity",
-        "AutoScalingGroupName" : { "Ref" : "WebServerGroup" },
+        "AutoScalingGroupName" : { "Ref" : "WebServerASG" },
         "Cooldown" : "60",
         "ScalingAdjustment" : "3"
       }
@@ -109,7 +79,7 @@
       "Type" : "AWS::AutoScaling::ScalingPolicy",
       "Properties" : {
         "AdjustmentType" : "ChangeInCapacity",
-        "AutoScalingGroupName" : { "Ref" : "WebServerGroup" },
+        "AutoScalingGroupName" : { "Ref" : "WebServerASG" },
         "Cooldown" : "60",
         "ScalingAdjustment" : "-1"
       }
@@ -129,7 +99,7 @@
         "Dimensions": [
           {
             "Name": "AutoScalingGroupName",
-            "Value": { "Ref": "WebServerGroup" }
+            "Value": { "Ref": "WebServerASG" }
           }
         ],
         "ComparisonOperator": "GreaterThanThreshold"
@@ -150,7 +120,7 @@
         "Dimensions": [
           {
             "Name": "AutoScalingGroupName",
-            "Value": { "Ref": "WebServerGroup" }
+            "Value": { "Ref": "WebServerASG" }
           }
         ],
         "ComparisonOperator": "LessThanThreshold"
