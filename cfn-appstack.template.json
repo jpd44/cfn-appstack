@@ -7,7 +7,7 @@
     "InstanceType" : {
       "Description" : "Type of EC2 instance to launch",
       "Type" : "String",
-      "Default" : "m1.small"
+      "Default" : "m3.medium"
     },
     "WebServerPort" : {
       "Description" : "The TCP port for the Web Server",
@@ -60,7 +60,7 @@
       "Type" : "AWS::AutoScaling::LaunchConfiguration",
       "Properties" : {
         "KeyName" : { "Ref" : "KeyName" },
-        "ImageId" : "ami-f0f6d1e7",
+        "ImageId" : "ami-42f1d655",
         "SecurityGroups" : [ { "Ref" : "InstanceSecurityGroup" } ],
         "InstanceType" : "m1.small"
       }
